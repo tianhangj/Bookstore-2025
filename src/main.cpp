@@ -18,19 +18,19 @@ Context* cur_context;
 // [Username]: (.+)
 // [Privilege]: ([0137])
 const std::regex switch_user("^ *su +([0-9a-zA-Z_]+)( +([0-9a-zA-Z_]+))? *$");
-const std::regex logout("^ *logout$");
+const std::regex logout("^ *logout *$");
 const std::regex register_user("^ *register +([0-9a-zA-Z_]+) +([0-9a-zA-Z_]+) +([^\\s]+) *$");
 const std::regex change_passwd("^ *passwd +([0-9a-zA-Z_]+)( +([0-9a-zA-Z_]+))? +([0-9a-zA-Z_]+) *$");
 const std::regex add_user("^ *useradd +([0-9a-zA-Z_]+) +([0-9a-zA-Z_]+) +([0137]) +(.+) *$");
-const std::regex delete_user("^ *delete +([0-9a-zA-Z_]+)$");
+const std::regex delete_user("^ *delete +([0-9a-zA-Z_]+) *$");
 
 // [ISBN]: ([^\\s]+:ISBN)
 // [BookName]: ([^\\s\"]+:bookname)
 // [Quantity]: ([0-9]+:quantity)
 const std::regex show_book(
     "^ *show(( +-(ISBN)=([^\\s]+))|( +-(name)=\"([^\\s\"]+)\")|( +-(author)=\"([^\\s\"]+)\")|( +-(keyword)=\"([^\\s\"]+)\"))? *$");
-const std::regex buy("^ *buy ([^\\s]+) ([0-9]+) *$");
-const std::regex select_book("^ *select ([^\\s]+) *$");
+const std::regex buy("^ *buy +([^\\s]+) +([0-9]+) *$");
+const std::regex select_book("^ *select +([^\\s]+) *$");
 const std::regex modify_book(
     "^ *modify(( +-(ISBN)=([^\\s]+))|( +-(name)=\"([^\\s\"]+)\")|( +-(author)=\"([^\\s\"]+)\")|( +"
     "-(keyword)=\"([^\\s\"]+)\")|( +-(price)=([0-9\\.]+)))+ *$");
