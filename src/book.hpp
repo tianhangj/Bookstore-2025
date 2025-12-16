@@ -10,7 +10,7 @@ struct Book {
     double price;
     int quantity;
     Book() {
-        ISBN = name = author = keyword = "uninitialized";
+        ISBN = name = author = keyword = "";
         price = quantity = 0;
     }
     const bool operator==(const Book rhs) const {
