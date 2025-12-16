@@ -10,7 +10,7 @@
 
 #include "string.hpp"
 
-template <class T>
+template <class Key, class T>
 class Database {
    private:
     const static int BLOCK_SIZE = 1000;
@@ -21,7 +21,7 @@ class Database {
     struct Node {
         int next_pos;
         int n;
-        std::pair<String, T> key_values[BLOCK_SIZE];
+        std::pair<Key, T> key_values[BLOCK_SIZE];
     };
     template <class DT>
     void write(const DT& val, int pos) {
@@ -38,10 +38,10 @@ class Database {
     }
     int cur_pos;
 
-    void _lower_bound(const String& key, const T& value, Node& node, int& node_pos,
+    void _lower_bound(const Key& key, const T& value, Node& node, int& node_pos,
                       int& value_index) {
         value_index = -1;
-        const std::pair<String, T> key_value(key, value);
+        const std::pair<Key, T> key_value(key, value);
         for (int pos = metadata.head_pos; pos != -1; pos = node.next_pos) {
             this->read(node, pos);
             node_pos = pos;
@@ -59,7 +59,7 @@ class Database {
             }
         }
     }
-    void _lower_bound(const String& key, Node& node, int& node_pos, int& value_index) {
+    void _lower_bound(const Key& key, Node& node, int& node_pos, int& value_index) {
         value_index = -1;
         for (int pos = metadata.head_pos; pos != -1; pos = node.next_pos) {
             this->read(node, pos);
@@ -103,7 +103,7 @@ class Database {
     }
     ~Database() { file.close(); }
 
-    void insert(const String& key, const T& value) {
+    void insert(const Key& key, const T& value) {
         Node node;
         int node_pos, value_index;
         this->_lower_bound(key, value, node, node_pos, value_index);
@@ -147,7 +147,7 @@ class Database {
             this->write(node, node_pos);
         }
     }
-    void remove(const String& key, const T& value) {
+    void remove(const Key& key, const T& value) {
         Node node;
         int node_pos, value_index;
         this->_lower_bound(key, value, node, node_pos, value_index);
@@ -171,7 +171,7 @@ class Database {
             this->write(node, node_pos);
         }
     }
-    std::vector<T> query(String key) {
+    std::vector<T> query(Key key) {
         Node node;
         int node_pos, value_index;
         this->_lower_bound(key, node, node_pos, value_index);
@@ -205,6 +205,16 @@ class Database {
             }
         }
         return ret;
+    }
+    std::pair<Key, T> begin() {
+        Node node;
+        for (int pos = metadata.head_pos; pos != -1; pos = node.next_pos) {
+            this->read(node, pos);
+            if ( node.n ) {
+                return node.key_values[0];
+            }
+        }
+        assert(false);
     }
 };
 // usage example:
