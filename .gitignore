@@ -1,1 +1,11 @@
-requirements.md
+testcases/
+scripts/
+
+CMakeFiles/
+CMakeCache.txt
+Makefile
+cmake_install.cmake
+
+data/
+test/
+code
