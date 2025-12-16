@@ -29,7 +29,7 @@ const std::regex delete_user("^ *delete +([0-9a-zA-Z_]{1,30}) *$");
 // [Quantity]: ([0-9]+:quantity)
 const std::regex show_book(
     "^ *show(( +-(ISBN)=([^\\s]{1,20}))|( +-(name)=\"([^\"]{1,60})\")|( +-(author)=\"([^\"]{1,60})\")|( +-(keyword)=\"([^\"|]{1,60})\"))? *$");
-const std::regex buy("^ *buy +([^\\s]{1,20}) +(([1-9][0-9]{0,9})|0) *$");
+const std::regex buy("^ *buy +([^\\s]{1,20}) +([1-9][0-9]{0,9}) *$");
 const std::regex select_book("^ *select +([^\\s]{1,20}) *$");
 const std::regex modify_book(
     "^ *modify(( +-(ISBN)=([^\\s]{1,20}))|( +-(name)=\"([^\"]{1,60})\")|( +-(author)=\"([^\"]{1,60})\")|( +"
@@ -48,7 +48,7 @@ int main() {
         std::cin.getline(buffer, 1024);
         std::string input(buffer);
         std::smatch result;
-        // cerr << "> " << buffer << endl;
+        cerr << "> " << buffer << endl;
         if (input == "exit" || input == "quit") {
             Context::get_default_context()->close();
             return 0;
@@ -147,10 +147,17 @@ int main() {
             if (result.size() == 1) {
                 Invalid;
             } else {
+                // for ( auto p: result ) {
+                //     cout << p << endl;
+                // }
                 std::vector<std::pair<String, String>> modifier;
-                for (int i = 3; i < result.size(); i += 3) {
+                for (int i = 3; i < 18; i += 3) {
                     if (result[i].length()) {
                         modifier.emplace_back(result[i], result[i + 1]);
+                        cerr << result[i] << endl;
+                        std::string key = result[i];
+                        key = " -" + key + "=\"";
+                        assert(input.find(key)==input.rfind(key));
                         // cerr << result[i] << " " << result[i + 1] << endl;
                     }
                 }
