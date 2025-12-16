@@ -1,7 +1,10 @@
 #pragma once
 
 #include <set>
+#include <utility>
 #include <vector>
+#include <filesystem>
+#include <iostream>
 
 #include "book.hpp"
 #include "database.hpp"
@@ -10,48 +13,71 @@
 class Context {
    private:
     Context() {
+        if (!std::filesystem::exists("./data")) {
+            std::filesystem::create_directory("./data");
+        }
         cur_user = User::default_user();
         login_users = new std::multiset<String>;
         login_users->insert(cur_user.userid);
         select_book = "";
-        user_db = new Database<User>("./data/user.db");
+        user_db = new Database<String, User>("./data/user.db");
         std::vector<User> cur_root = user_db->query("root");
         if (cur_root.empty()) {
             User user_root("root", "root", "sjtu", 7);
             user_db->insert("root", user_root);
         }
-        ISBN_db = new Database<Book>("./data/isbn.db");
-        bookname_db = new Database<Book>("./data/bookname.db");
-        author_db = new Database<Book>("./data/author.db");
-        keyword_db = new Database<Book>("./data/keyword.db");
+        ISBN_db = new Database<String, Book>("./data/isbn.db");
+        bookname_db = new Database<String, Book>("./data/bookname.db");
+        author_db = new Database<String, Book>("./data/author.db");
+        keyword_db = new Database<String, Book>("./data/keyword.db");
+
+        finance_db = new Database<int, std::pair<double, double>>("./data/finance.db");
+        auto finance_root = finance_db->query(0);
+        if (finance_root.empty()) {
+            finance_db->insert(0, std::make_pair(0.0, 0.0));
+        }
+        this->father_context = nullptr;
     }
     Context(Context* context, User user) {
+        login_users = context->login_users;
+
         user_db = context->user_db;
         ISBN_db = context->ISBN_db;
         bookname_db = context->bookname_db;
         author_db = context->author_db;
         keyword_db = context->keyword_db;
-        login_users = context->login_users;
+        finance_db = context->finance_db;
 
         cur_user = user;
         select_book = "";
+        father_context = context;
     }
 
    public:
     std::multiset<String>* login_users;
     User cur_user;
     String select_book;
-    Database<User>* user_db;
-    Database<Book>* ISBN_db;
-    Database<Book>* bookname_db;
-    Database<Book>* author_db;
-    Database<Book>* keyword_db;
+    Database<String, User>* user_db;
+    Database<String, Book>* ISBN_db;
+    Database<String, Book>* bookname_db;
+    Database<String, Book>* author_db;
+    Database<String, Book>* keyword_db;
+    Database<int, std::pair<double, double>>* finance_db;
+    struct Context *father_context;
 
    public:
     Context(Context& context) = default;
     static Context* get_default_context() {
         static Context context;
         return &context;
+    }
+    void close() {
+        delete this->user_db;
+
+        delete this->ISBN_db;
+        delete this->bookname_db;
+        delete this->author_db;
+        delete this->keyword_db;
     }
     int get_privilege() { return cur_user.privilege; }
     Context* switch_user(String userid, String passwd) {
@@ -175,6 +201,9 @@ class Context {
     }
 
     bool find_book(String filter_type, String filter, std::vector<Book>& output) {
+        if ( this->cur_user.privilege < 1 ) {
+            return false;
+        }
         if (filter_type == "ISBN") {
             output = ISBN_db->query(filter);
             return true;
@@ -223,9 +252,15 @@ class Context {
         if (book.empty()) {
             return -1;
         }
+        if ( book[0].quantity < quantity ) {
+            return -1;
+        }
         book[0].quantity -= quantity;
         this->update_book(book[0]);
-        return book[0].price * quantity;
+        double cost = book[0].price * quantity;
+        auto [timestamp, p] = finance_db->begin();
+        finance_db->insert(timestamp - 1, std::make_pair(p.first + cost, p.second));
+        return cost;
     }
 
     bool modify(std::vector<std::pair<String, String>> modifier) {
@@ -242,8 +277,10 @@ class Context {
         Book original_book = book[0], new_book = book[0];
         for (const auto& [key, value] : modifier) {
             if (key == "ISBN") {
-                if (value != original_book.ISBN && ISBN_db->query(key).empty()) {
+                if (ISBN_db->query(value).empty()) {
                     new_book.ISBN = value;
+                } else {
+                    return false;
                 }
             } else if (key == "name") {
                 new_book.name = value;
@@ -280,6 +317,11 @@ class Context {
         this->remove_book(original_book);
         this->update_book(new_book);
         this->select_book = new_book.ISBN;
+        for ( struct Context* i = this; i != nullptr; i = i->father_context ) {
+            if ( i->select_book == original_book.ISBN ) {
+                i->select_book = new_book.ISBN;
+            }
+        }
         return true;
     }
 
@@ -297,8 +339,33 @@ class Context {
         if (book.empty()) {
             return false;
         }
+        auto [timestamp, p] = finance_db->begin();
+        finance_db->insert(timestamp - 1, std::make_pair(p.first, p.second + total_cost));
         book[0].quantity += quantity;
         this->update_book(book[0]);
+        return true;
+    }
+
+    bool show_finance(int count, String& out) {
+        if ( this->cur_user.privilege < 7 ) {
+            return false;
+        }
+        if (count == 0) {
+            out = "";
+            return true;
+        }
+        auto [timestamp, p] = finance_db->begin();
+        auto [a, b] = p;
+        if (count != -1) {
+            if (count + timestamp > 0) {
+                return false;
+            }
+            std::vector<std::pair<double, double>> ret = finance_db->query(timestamp + count);
+            assert(ret.size() == 1);
+            a -= ret[0].first;
+            b -= ret[0].second;
+        }
+        sprintf(out.s, "+ %.2lf - %.2lf", a, b);
         return true;
     }
 };
