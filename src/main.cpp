@@ -46,20 +46,19 @@ int main() {
     cur_context = Context::get_default_context();
     while (true) {
         std::cin.getline(buffer, 1024);
-        int l = strlen(buffer);
-        while ( l > 0 && buffer[l-1] == ' ') {
-            buffer[--l] = '\0';
-        }
         std::string input(buffer);
         std::smatch result;
-        cerr << "> " << buffer << endl;
+        // cerr << "> " << buffer << endl;
         if (input == "exit" || input == "quit") {
             Context::get_default_context()->close();
             return 0;
         }
         if ( input == "" ) {
-            Context::get_default_context()->close();
-            return 0;
+            if ( std::cin.eof() ) {
+                Context::get_default_context()->close();
+                return 0;
+            }
+            continue;
         }
         if (std::regex_match(input, result, switch_user)) {
             std::string userid = result[1], passwd = result[3];
@@ -162,12 +161,16 @@ int main() {
             std::string _quantity = result[1], _total_cost = result[2];
             long long quantity;
             double total_cost;
-            sscanf(_quantity.c_str(), "%lld", &quantity);
-            sscanf(_total_cost.c_str(), "%lf", &total_cost);
-            if ( quantity > 2147483647 ) {
+            if ( _total_cost.size() > 13 ) {
                 Invalid;
-            } else if (!cur_context->import_book(quantity, total_cost)) {
-                Invalid;
+            } else {
+                sscanf(_quantity.c_str(), "%lld", &quantity);
+                sscanf(_total_cost.c_str(), "%lf", &total_cost);
+                if ( quantity > 2147483647 ) {
+                    Invalid;
+                } else if (!cur_context->import_book(quantity, total_cost)) {
+                    Invalid;
+                }
             }
         } else if (std::regex_match(input, result, show_finance)) {
             long long count = -1;

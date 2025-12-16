@@ -93,7 +93,7 @@ class Context {
         }
     }
     bool logout() {
-        if (this->cur_user.privilege == 0) {
+        if (this->cur_user.privilege < 1) {
             return false;
         }
         login_users->erase(login_users->lower_bound(this->cur_user.userid));
@@ -310,6 +310,9 @@ class Context {
                 }
                 new_book.keyword = value;
             } else if (key == "price") {
+                if ( strlen(value.s) > 13 ) {
+                    return false;
+                }
                 sscanf(value.s, "%lf", &(new_book.price));
             }
         }
