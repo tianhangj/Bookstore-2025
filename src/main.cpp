@@ -29,14 +29,14 @@ const std::regex delete_user("^ *delete +([0-9a-zA-Z_]{1,30}) *$");
 // [Quantity]: ([0-9]+:quantity)
 const std::regex show_book(
     "^ *show(( +-(ISBN)=([^\\s]{1,20}))|( +-(name)=\"([^\"]{1,60})\")|( +-(author)=\"([^\"]{1,60})\")|( +-(keyword)=\"([^\"|]{1,60})\"))? *$");
-const std::regex buy("^ *buy +([^\\s]{1,20}) +(([1-9][0-9]*)|0) *$");
+const std::regex buy("^ *buy +([^\\s]{1,20}) +(([1-9][0-9]{0,9})|0) *$");
 const std::regex select_book("^ *select +([^\\s]{1,20}) *$");
 const std::regex modify_book(
     "^ *modify(( +-(ISBN)=([^\\s]{1,20}))|( +-(name)=\"([^\"]{1,60})\")|( +-(author)=\"([^\"]{1,60})\")|( +"
     "-(keyword)=\"([^\"]{1,60})\")|( +-(price)=((([1-9][0-9]*)|0)(\\.[0-9]{1,2})?)))+ *$");
-const std::regex import_book("^ *import +([1-9][0-9]*) +((([1-9][0-9]*)|0)(\\.[0-9]{1,2})?) *$");
+const std::regex import_book("^ *import +([1-9][0-9]{0,9}) +((([1-9][0-9]*)|0)(\\.[0-9]{1,2})?) *$");
 
-const std::regex show_finance("^ *show finance( +(([1-9][0-9]*)|0))? *$");
+const std::regex show_finance("^ *show finance( +(([1-9][0-9]{0,9})|0))? *$");
 
 // #define Invalid cout << "Invalid" << "--------------" << __LINE__ << "\n"
 #define Invalid cout << "Invalid\n"
@@ -126,13 +126,17 @@ int main() {
             }
         } else if (std::regex_match(input, result, buy)) {
             std::string ISBN = result[1], _quantity = result[2];
-            int quantity;
-            sscanf(_quantity.c_str(), "%d", &quantity);
-            double ret = cur_context->buy(ISBN, quantity);
-            if (ret < 0) {
+            long long quantity;
+            sscanf(_quantity.c_str(), "%lld", &quantity);
+            if ( quantity > 2147483647 ) {
                 Invalid;
             } else {
-                std::cout << std::fixed << std::setprecision(2) << ret << "\n";
+                double ret = cur_context->buy(ISBN, quantity);
+                if (ret < 0) {
+                    Invalid;
+                } else {
+                    std::cout << std::fixed << std::setprecision(2) << ret << "\n";
+                }
             }
         } else if (std::regex_match(input, result, select_book)) {
             std::string ISBN = result[1];
@@ -156,26 +160,31 @@ int main() {
             }
         } else if (std::regex_match(input, result, import_book)) {
             std::string _quantity = result[1], _total_cost = result[2];
-            int quantity;
+            long long quantity;
             double total_cost;
-            sscanf(_quantity.c_str(), "%d", &quantity);
+            sscanf(_quantity.c_str(), "%lld", &quantity);
             sscanf(_total_cost.c_str(), "%lf", &total_cost);
-            if (!cur_context->import_book(quantity, total_cost)) {
+            if ( quantity > 2147483647 ) {
+                Invalid;
+            } else if (!cur_context->import_book(quantity, total_cost)) {
                 Invalid;
             }
         } else if (std::regex_match(input, result, show_finance)) {
-            int count = -1;
+            long long count = -1;
             std::string _count = result[2];
-            sscanf(_count.c_str(), "%d", &count);
-            String output;
-            if (cur_context->show_finance(count, output)) {
-                cout << output << "\n";
-            } else {
+            sscanf(_count.c_str(), "%lld", &count);
+            if ( count > 2147483647 ) {
                 Invalid;
+            } else {
+                String output;
+                if (cur_context->show_finance(count, output)) {
+                    cout << output << "\n";
+                } else {
+                    Invalid;
+                }
             }
         } else {
             Invalid;
         }
     }
-    // TODO: 财务记录查询
 }
