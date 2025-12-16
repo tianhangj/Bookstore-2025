@@ -29,14 +29,14 @@ const std::regex delete_user("^ *delete +([0-9a-zA-Z_]+) *$");
 // [Quantity]: ([0-9]+:quantity)
 const std::regex show_book(
     "^ *show(( +-(ISBN)=([^\\s]+))|( +-(name)=\"([^\\s\"]+)\")|( +-(author)=\"([^\\s\"]+)\")|( +-(keyword)=\"([^\\s\"]+)\"))? *$");
-const std::regex buy("^ *buy +([^\\s]+) +([0-9]+) *$");
+const std::regex buy("^ *buy +([^\\s]+) +(([1-9][0-9]*)|0) *$");
 const std::regex select_book("^ *select +([^\\s]+) *$");
 const std::regex modify_book(
     "^ *modify(( +-(ISBN)=([^\\s]+))|( +-(name)=\"([^\\s\"]+)\")|( +-(author)=\"([^\\s\"]+)\")|( +"
-    "-(keyword)=\"([^\\s\"]+)\")|( +-(price)=([0-9]+(\\.[0-9]+)?)))+ *$");
-const std::regex import_book("^ *import +([0-9]+) +([0-9]+(\\.[0-9]+)?) *$");
+    "-(keyword)=\"([^\\s\"]+)\")|( +-(price)=((([1-9][0-9]*)|0)(\\.[0-9]{1,2})?)))+ *$");
+const std::regex import_book("^ *import +([0-9]+) +((([1-9][0-9]*)|0)(\\.[0-9]{1,2})?) *$");
 
-const std::regex show_finance("^ *show finance( +([0-9]+))? *$");
+const std::regex show_finance("^ *show finance( +(([1-9][0-9]*)|0))? *$");
 
 // #define Invalid cout << "Invalid" << "--------------" << __LINE__ << "\n"
 #define Invalid cout << "Invalid\n"
