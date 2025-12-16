@@ -50,12 +50,7 @@ using std::cout, std::cerr, std::endl;
 
 bool getline(std::string& input) {
     input.clear();
-    char c = '\0';
-    while (std::cin.get(c) && (c == '\n' || c == '\r')) {
-    }
-    if (c) {
-        input += c;
-    }
+    char c;
     while (std::cin.get(c)) {
         if (c == '\n' || c == '\r') {
             return true;
