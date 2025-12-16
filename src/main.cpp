@@ -57,6 +57,8 @@ int main() {
             if ( std::cin.eof() ) {
                 Context::get_default_context()->close();
                 return 0;
+            } else {
+                continue;
             }
         }
         if (std::regex_match(input, result, switch_user)) {
