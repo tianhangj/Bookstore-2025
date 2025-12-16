@@ -331,7 +331,7 @@ class Context {
         if (this->select_book == "") {
             return false;
         }
-        if (quantity <= 0 || total_cost < 0) {
+        if (quantity <= 0 || total_cost <= 0) {
             return false;
         }
         std::vector<Book> book = ISBN_db->query(this->select_book);
