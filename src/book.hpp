@@ -13,7 +13,13 @@ struct Book {
         ISBN = name = author = keyword = "uninitialized";
         price = quantity = 0;
     }
-    const std::partial_ordering operator<=>(const Book rhs) const {
-        return this->ISBN <=> rhs.ISBN;
+    const bool operator==(const Book rhs) const {
+        return this->ISBN == rhs.ISBN;
+    }
+    const bool operator>=(const Book rhs) const {
+        return this->ISBN >= rhs.ISBN;
+    }
+    const bool operator<(const Book rhs) const {
+        return this->ISBN < rhs.ISBN;
     }
 };
