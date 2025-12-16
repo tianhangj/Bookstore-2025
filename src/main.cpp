@@ -36,7 +36,7 @@ const std::regex modify_book(
     "-(keyword)=\"([^\"]{1,60})\")|( +-(price)=((([1-9][0-9]*)|0)(\\.[0-9]{1,2})?)))+ *$");
 const std::regex import_book("^ *import +([1-9][0-9]{0,9}) +((([1-9][0-9]*)|0)(\\.[0-9]{1,2})?) *$");
 
-const std::regex show_finance("^ *show finance( +(([1-9][0-9]{0,9})|0))? *$");
+const std::regex show_finance("^ *show +finance( +(([1-9][0-9]{0,9})|0))? *$");
 
 // #define Invalid cout << "Invalid" << "--------------" << __LINE__ << "\n"
 #define Invalid cout << "Invalid\n"
@@ -49,9 +49,15 @@ int main() {
         std::string input(buffer);
         std::smatch result;
         // cerr << "> " << buffer << endl;
-        if (input == "exit" || input == "quit" || input == "") {
+        if (input == "exit" || input == "quit") {
             Context::get_default_context()->close();
             return 0;
+        }
+        if ( input == "" ) {
+            if ( std::cin.eof() ) {
+                Context::get_default_context()->close();
+                return 0;
+            }
         }
         if (std::regex_match(input, result, switch_user)) {
             std::string userid = result[1], passwd = result[3];
