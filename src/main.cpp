@@ -46,6 +46,10 @@ int main() {
     cur_context = Context::get_default_context();
     while (true) {
         std::cin.getline(buffer, 1024);
+        int l = strlen(buffer);
+        while ( l > 0 && buffer[l-1] == ' ' ) {
+            buffer[--l] = '\0';
+        }
         std::string input(buffer);
         std::smatch result;
         cerr << "> " << buffer << endl;
