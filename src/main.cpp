@@ -31,14 +31,14 @@ const std::regex delete_user("^ *delete +([0-9a-zA-Z_]{1,30}) *$");
 // [BookName]: ([^\"]+:bookname)
 // [Quantity]: ([0-9]+:quantity)
 const std::regex show_book(
-    "^ *show(( +-(ISBN)=([^\\s]{1,20}))|( +-(name)=\"([^\"]{0,60})\")|( "
-    "+-(author)=\"([^\"]{0,60})\")|( +-(keyword)=\"([^\"|]{0,60})\"))? *$");
-const std::regex buy("^ *buy +([^\\s]{1,20}) +([1-9][0-9]{0,9}) *$");
-const std::regex select_book("^ *select +([^\\s]{1,20}) *$");
+    "^ *show(( +-(ISBN)=([^\\s ]{1,20}))|( +-(name)=\"([^\" ]{0,60})\")|( "
+    "+-(author)=\"([^\" ]{0,60})\")|( +-(keyword)=\"([^\"| ]{0,60})\"))? *$");
+const std::regex buy("^ *buy +([^\\s ]{1,20}) +([1-9][0-9]{0,9}) *$");
+const std::regex select_book("^ *select +([^\\s ]{1,20}) *$");
 const std::regex modify_book(
-    "^ *modify(( +-(ISBN)=([^\\s]{1,20}))|( +-(name)=\"([^\"]{0,60})\")|( "
-    "+-(author)=\"([^\"]{0,60})\")|( +"
-    "-(keyword)=\"([^\"]{0,60})\")|( +-(price)=((([1-9][0-9]*)|0)(\\.[0-9]{1,2})?)))+ *$");
+    "^ *modify(( +-(ISBN)=([^\\s ]{1,20}))|( +-(name)=\"([^\" ]{0,60})\")|( "
+    "+-(author)=\"([^\" ]{0,60})\")|( +"
+    "-(keyword)=\"([^\" ]{0,60})\")|( +-(price)=((([1-9][0-9]*)|0)(\\.[0-9]{1,2})?)))+ *$");
 const std::regex import_book(
     "^ *import +([1-9][0-9]{0,9}) +((([1-9][0-9]*)|0)(\\.[0-9]{1,2})?) *$");
 
@@ -50,7 +50,12 @@ using std::cout, std::cerr, std::endl;
 
 bool getline(std::string& input) {
     input.clear();
-    char c;
+    char c = '\0';
+    while (std::cin.get(c) && (c == '\n' || c == '\r')) {
+    }
+    if (c) {
+        input += c;
+    }
     while (std::cin.get(c)) {
         if (c == '\n' || c == '\r') {
             return true;
@@ -66,7 +71,7 @@ int main() {
         std::string input;
         bool eof_flag = getline(input);
         std::smatch result;
-        cerr << "> " << buffer << endl;
+        // cerr << "> " << buffer << endl;
         if (input == "exit" || input == "quit") {
             Context::get_default_context()->close();
             return 0;
@@ -171,7 +176,7 @@ int main() {
                 for (int i = 3; i < 18; i += 3) {
                     if (result[i].length()) {
                         modifier.emplace_back(result[i], result[i + 1]);
-                        cerr << result[i] << endl;
+                        // cerr << result[i] << endl;
                         std::string key = result[i];
                         key = " -" + key + "=\"";
                         assert(input.find(key) == input.rfind(key));
