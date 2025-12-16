@@ -31,14 +31,14 @@ const std::regex delete_user("^ *delete +([0-9a-zA-Z_]{1,30}) *$");
 // [BookName]: ([^\"]+:bookname)
 // [Quantity]: ([0-9]+:quantity)
 const std::regex show_book(
-    "^ *show(( +-(ISBN)=([^\\s ]{1,20}))|( +-(name)=\"([^\" ]{0,60})\")|( "
-    "+-(author)=\"([^\" ]{0,60})\")|( +-(keyword)=\"([^\"| ]{0,60})\"))? *$");
+    "^ *show(( +-(ISBN)=([^\\s]{1,20}))|( +-(name)=\"([^\"\\s]{0,60})\")|( "
+    "+-(author)=\"([^\"\\s]{0,60})\")|( +-(keyword)=\"([^\"|\\s]{0,60})\"))? *$");
 const std::regex buy("^ *buy +([^\\s ]{1,20}) +([1-9][0-9]{0,9}) *$");
-const std::regex select_book("^ *select +([^\\s ]{1,20}) *$");
+const std::regex select_book("^ *select +([^\\s]{1,20}) *$");
 const std::regex modify_book(
-    "^ *modify(( +-(ISBN)=([^\\s ]{1,20}))|( +-(name)=\"([^\" ]{0,60})\")|( "
-    "+-(author)=\"([^\" ]{0,60})\")|( +"
-    "-(keyword)=\"([^\" ]{0,60})\")|( +-(price)=((([1-9][0-9]*)|0)(\\.[0-9]{1,2})?)))+ *$");
+    "^ *modify(( +-(ISBN)=([^\\s]{1,20}))|( +-(name)=\"([^\"\\s]{0,60})\")|( "
+    "+-(author)=\"([^\"\\s]{0,60})\")|( +"
+    "-(keyword)=\"([^\"\\s]{0,60})\")|( +-(price)=((([1-9][0-9]*)|0)(\\.[0-9]{1,2})?)))+ *$");
 const std::regex import_book(
     "^ *import +([1-9][0-9]{0,9}) +((([1-9][0-9]*)|0)(\\.[0-9]{1,2})?) *$");
 
