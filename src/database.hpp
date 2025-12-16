@@ -199,8 +199,9 @@ class Database {
         Node node;
         std::vector<T> ret;
         for (int pos = metadata.head_pos; pos != -1; pos = node.next_pos) {
+            this->read(node, pos);
             for (int i = 0; i < node.n; ++i) {
-                ret.insert(node.key_values[i].second);
+                ret.push_back(node.key_values[i].second);
             }
         }
         return ret;
