@@ -19,22 +19,28 @@ Context* cur_context;
 // [Privilege]: ([0137])
 const std::regex switch_user("^ *su +([0-9a-zA-Z_]{1,30})( +([0-9a-zA-Z_]{1,30}))? *$");
 const std::regex logout("^ *logout *$");
-const std::regex register_user("^ *register +([0-9a-zA-Z_]{1,30}) +([0-9a-zA-Z_]{1,30}) +([^\\s]{1,30}) *$");
-const std::regex change_passwd("^ *passwd +([0-9a-zA-Z_]{1,30})( +([0-9a-zA-Z_]{1,30}))? +([0-9a-zA-Z_]{1,30}) *$");
-const std::regex add_user("^ *useradd +([0-9a-zA-Z_]{1,30}) +([0-9a-zA-Z_]{1,30}) +([0137]) +([^\\s]{1,30}) *$");
+const std::regex register_user(
+    "^ *register +([0-9a-zA-Z_]{1,30}) +([0-9a-zA-Z_]{1,30}) +([^\\s]{1,30}) *$");
+const std::regex change_passwd(
+    "^ *passwd +([0-9a-zA-Z_]{1,30})( +([0-9a-zA-Z_]{1,30}))? +([0-9a-zA-Z_]{1,30}) *$");
+const std::regex add_user(
+    "^ *useradd +([0-9a-zA-Z_]{1,30}) +([0-9a-zA-Z_]{1,30}) +([0137]) +([^\\s]{1,30}) *$");
 const std::regex delete_user("^ *delete +([0-9a-zA-Z_]{1,30}) *$");
 
 // [ISBN]: ([^\\s]+:ISBN)
 // [BookName]: ([^\"]+:bookname)
 // [Quantity]: ([0-9]+:quantity)
 const std::regex show_book(
-    "^ *show(( +-(ISBN)=([^\\s]{1,20}))|( +-(name)=\"([^\"]{1,60})\")|( +-(author)=\"([^\"]{1,60})\")|( +-(keyword)=\"([^\"|]{1,60})\"))? *$");
+    "^ *show(( +-(ISBN)=([^\\s]{1,20}))|( +-(name)=\"([^\"]{1,60})\")|( "
+    "+-(author)=\"([^\"]{1,60})\")|( +-(keyword)=\"([^\"|]{1,60})\"))? *$");
 const std::regex buy("^ *buy +([^\\s]{1,20}) +([1-9][0-9]{0,9}) *$");
 const std::regex select_book("^ *select +([^\\s]{1,20}) *$");
 const std::regex modify_book(
-    "^ *modify(( +-(ISBN)=([^\\s]{1,20}))|( +-(name)=\"([^\"]{1,60})\")|( +-(author)=\"([^\"]{1,60})\")|( +"
+    "^ *modify(( +-(ISBN)=([^\\s]{1,20}))|( +-(name)=\"([^\"]{1,60})\")|( "
+    "+-(author)=\"([^\"]{1,60})\")|( +"
     "-(keyword)=\"([^\"]{1,60})\")|( +-(price)=((([1-9][0-9]*)|0)(\\.[0-9]{1,2})?)))+ *$");
-const std::regex import_book("^ *import +([1-9][0-9]{0,9}) +((([1-9][0-9]*)|0)(\\.[0-9]{1,2})?) *$");
+const std::regex import_book(
+    "^ *import +([1-9][0-9]{0,9}) +((([1-9][0-9]*)|0)(\\.[0-9]{1,2})?) *$");
 
 const std::regex show_finance("^ *show +finance( +(([1-9][0-9]{0,9})|0))? *$");
 
@@ -42,28 +48,35 @@ const std::regex show_finance("^ *show +finance( +(([1-9][0-9]{0,9})|0))? *$");
 #define Invalid cout << "Invalid\n"
 using std::cout, std::cerr, std::endl;
 
+bool getline(std::string& input) {
+    input.clear();
+    char c;
+    while (std::cin.get(c)) {
+        if (c == '\n' || c == '\r') {
+            return true;
+        }
+        input += c;
+    }
+    return false;
+}
+
 int main() {
     cur_context = Context::get_default_context();
     while (true) {
-        std::cin.getline(buffer, 1024);
-        int l = strlen(buffer);
-        while ( l > 0 && buffer[l-1] == ' ' ) {
-            buffer[--l] = '\0';
-        }
-        std::string input(buffer);
+        std::string input;
+        bool eof_flag = getline(input);
         std::smatch result;
         cerr << "> " << buffer << endl;
         if (input == "exit" || input == "quit") {
             Context::get_default_context()->close();
             return 0;
         }
-        if ( input == "" ) {
-            if ( std::cin.eof() ) {
+        if (input == "") {
+            if (!eof_flag) {
                 Context::get_default_context()->close();
                 return 0;
-            } else {
-                continue;
             }
+            continue;
         }
         if (std::regex_match(input, result, switch_user)) {
             std::string userid = result[1], passwd = result[3];
@@ -132,7 +145,7 @@ int main() {
             std::string ISBN = result[1], _quantity = result[2];
             long long quantity;
             sscanf(_quantity.c_str(), "%lld", &quantity);
-            if ( quantity > 2147483647 ) {
+            if (quantity > 2147483647) {
                 Invalid;
             } else {
                 double ret = cur_context->buy(ISBN, quantity);
@@ -161,7 +174,7 @@ int main() {
                         cerr << result[i] << endl;
                         std::string key = result[i];
                         key = " -" + key + "=\"";
-                        assert(input.find(key)==input.rfind(key));
+                        assert(input.find(key) == input.rfind(key));
                         // cerr << result[i] << " " << result[i + 1] << endl;
                     }
                 }
@@ -173,12 +186,12 @@ int main() {
             std::string _quantity = result[1], _total_cost = result[2];
             long long quantity;
             double total_cost;
-            if ( _total_cost.size() > 13 ) {
+            if (_total_cost.size() > 13) {
                 Invalid;
             } else {
                 sscanf(_quantity.c_str(), "%lld", &quantity);
                 sscanf(_total_cost.c_str(), "%lf", &total_cost);
-                if ( quantity > 2147483647 ) {
+                if (quantity > 2147483647) {
                     Invalid;
                 } else if (!cur_context->import_book(quantity, total_cost)) {
                     Invalid;
@@ -188,7 +201,7 @@ int main() {
             long long count = -1;
             std::string _count = result[2];
             sscanf(_count.c_str(), "%lld", &count);
-            if ( count > 2147483647 ) {
+            if (count > 2147483647) {
                 Invalid;
             } else {
                 String output;
@@ -200,6 +213,10 @@ int main() {
             }
         } else {
             Invalid;
+        }
+        if (!eof_flag) {
+            Context::get_default_context()->close();
+            return 0;
         }
     }
 }
