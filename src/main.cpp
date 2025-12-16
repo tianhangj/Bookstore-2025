@@ -33,8 +33,8 @@ const std::regex buy("^ *buy +([^\\s]+) +([0-9]+) *$");
 const std::regex select_book("^ *select +([^\\s]+) *$");
 const std::regex modify_book(
     "^ *modify(( +-(ISBN)=([^\\s]+))|( +-(name)=\"([^\\s\"]+)\")|( +-(author)=\"([^\\s\"]+)\")|( +"
-    "-(keyword)=\"([^\\s\"]+)\")|( +-(price)=([0-9\\.]+)))+ *$");
-const std::regex import_book("^ *import +([0-9]+) +([0-9\\.]+) *$");
+    "-(keyword)=\"([^\\s\"]+)\")|( +-(price)=([0-9]+(\\.[0-9]+)?)))+ *$");
+const std::regex import_book("^ *import +([0-9]+) +([0-9]+(\\.[0-9]+)?) *$");
 
 const std::regex show_finance("^ *show finance( +([0-9]+))? *$");
 
