@@ -49,16 +49,9 @@ int main() {
         std::string input(buffer);
         std::smatch result;
         // cerr << "> " << buffer << endl;
-        if (input == "exit" || input == "quit") {
+        if (input == "exit" || input == "quit" || input == "") {
             Context::get_default_context()->close();
             return 0;
-        }
-        if ( input == "" ) {
-            if ( std::cin.eof() ) {
-                Context::get_default_context()->close();
-                return 0;
-            }
-            continue;
         }
         if (std::regex_match(input, result, switch_user)) {
             std::string userid = result[1], passwd = result[3];
