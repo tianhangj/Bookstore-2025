@@ -1,7 +1,5 @@
 #pragma once
 
-#include <compare>
-
 #include "string.hpp"
 
 struct User {
