@@ -1,9 +1,9 @@
 #pragma once
 
+#include <filesystem>
 #include <set>
 #include <utility>
 #include <vector>
-#include <filesystem>
 
 #include "book.hpp"
 #include "database.hpp"
@@ -62,7 +62,7 @@ class Context {
     Database<String, Book>* author_db;
     Database<String, Book>* keyword_db;
     Database<int, std::pair<double, double>>* finance_db;
-    struct Context *father_context;
+    struct Context* father_context;
 
    public:
     Context(Context& context) = default;
@@ -200,7 +200,7 @@ class Context {
     }
 
     bool find_book(String filter_type, String filter, std::vector<Book>& output) {
-        if ( this->cur_user.privilege < 1 ) {
+        if (this->cur_user.privilege < 1) {
             return false;
         }
         if (filter_type == "ISBN") {
@@ -251,7 +251,7 @@ class Context {
         if (book.empty()) {
             return -1;
         }
-        if ( book[0].quantity < quantity ) {
+        if (book[0].quantity < quantity) {
             return -1;
         }
         book[0].quantity -= quantity;
@@ -294,6 +294,9 @@ class Context {
                         keywd.s[index++] = value.s[i];
                     } else {
                         keywd.s[index] = '\0';
+                        if (index == 0) {
+                            return false;
+                        }
                         if (keywords.contains(keywd)) {
                             return false;
                         }
@@ -302,15 +305,16 @@ class Context {
                         keywd.s[0] = '\0';
                     }
                 }
-                if (index) {
-                    keywd.s[index] = '\0';
-                    if (keywords.contains(keywd)) {
-                        return false;
-                    }
+                if (index == 0 && value.s[0]) {
+                    return false;
+                }
+                keywd.s[index] = '\0';
+                if (keywords.contains(keywd)) {
+                    return false;
                 }
                 new_book.keyword = value;
             } else if (key == "price") {
-                if ( strlen(value.s) > 13 ) {
+                if (strlen(value.s) > 13) {
                     return false;
                 }
                 sscanf(value.s, "%lf", &(new_book.price));
@@ -319,8 +323,8 @@ class Context {
         this->remove_book(original_book);
         this->update_book(new_book);
         this->select_book = new_book.ISBN;
-        for ( struct Context* i = this; i != nullptr; i = i->father_context ) {
-            if ( i->select_book == original_book.ISBN ) {
+        for (struct Context* i = this; i != nullptr; i = i->father_context) {
+            if (i->select_book == original_book.ISBN) {
                 i->select_book = new_book.ISBN;
             }
         }
@@ -349,7 +353,7 @@ class Context {
     }
 
     bool show_finance(int count, String& out) {
-        if ( this->cur_user.privilege < 7 ) {
+        if (this->cur_user.privilege < 7) {
             return false;
         }
         if (count == 0) {
