@@ -128,9 +128,7 @@ int main() {
             }
             // cerr << filter_type << " " << filter << endl;
             std::vector<Book> output;
-            if (!cur_context->find_book(filter_type, filter, output)) {
-                Invalid;
-            } else {
+            if (cur_context->find_book(filter_type, filter, output)) {
                 if (output.size() == 0) {
                     std::cout << "\n";
                 } else {
@@ -140,6 +138,8 @@ int main() {
                                   << book.price << "\t" << book.quantity << "\n";
                     }
                 }
+            } else {
+                Invalid;
             }
         } else if (std::regex_match(input, result, buy)) {
             std::string ISBN = result[1], _quantity = result[2];
@@ -170,7 +170,7 @@ int main() {
                     modifier.emplace_back(result[i], result[i + 1]);
                     // cerr << result[i] << endl;
                     std::string key = result[i];
-                    key = " -" + key + "=\"";
+                    key = " -" + key + "=";
                     assert(input.find(key) == input.rfind(key));
                     // cerr << result[i] << " " << result[i + 1] << endl;
                 }
