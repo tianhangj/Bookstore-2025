@@ -135,6 +135,7 @@ class Context {
     }
 
     bool add_user(String userid, String passwd, int privilege, String username) {
+        assert(false);
         if (this->cur_user.privilege < 3) {
             return false;
         }
