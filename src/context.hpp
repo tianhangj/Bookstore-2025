@@ -86,7 +86,6 @@ class Context {
     Context* switch_user(String userid, String passwd) {
         std::vector<User> user = user_db->query(userid);
         if (user.empty()) {
-            assert(false);
             return nullptr;
         }
         assert(user.size() == 1);
@@ -94,7 +93,6 @@ class Context {
             login_users->insert(user[0].userid);
             return new Context(this, user[0]);
         } else {
-            assert(false);
             return nullptr;
         }
     }
@@ -124,7 +122,7 @@ class Context {
             return false;
         }
         assert(user.size() == 1);
-        if (this->cur_user.privilege == 7 || user[0].passwd == cur_passwd) {
+        if ((this->cur_user.privilege == 7 && user[0].passwd == "") || user[0].passwd == cur_passwd) {
             user_db->remove(userid, user[0]);
             user[0].passwd = new_passwd;
             user_db->insert(userid, user[0]);
@@ -135,7 +133,6 @@ class Context {
     }
 
     bool add_user(String userid, String passwd, int privilege, String username) {
-        assert(false);
         if (this->cur_user.privilege < 3) {
             return false;
         }
