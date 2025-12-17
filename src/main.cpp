@@ -163,29 +163,24 @@ int main() {
                 Invalid;
             }
         } else if (std::regex_match(input, result, modify_book)) {
-            if (result.size() == 1) {
-                Invalid;
-            } else {
-                // for ( auto p: result ) {
-                //     cout << p << endl;
-                // }
-                std::vector<std::pair<String, String>> modifier;
-                for (int i = 3; i < 18; i += 3) {
-                    if (result[i].length()) {
-                        modifier.emplace_back(result[i], result[i + 1]);
-                        // cerr << result[i] << endl;
-                        std::string key = result[i];
-                        key = " -" + key + "=\"";
-                        assert(input.find(key) == input.rfind(key));
-                        // cerr << result[i] << " " << result[i + 1] << endl;
-                    }
-                }
-                if (!cur_context->modify(modifier)) {
-                    Invalid;
+            // for ( auto p: result ) {
+            //     cerr << p << endl;
+            // }
+            std::vector<std::pair<String, String>> modifier;
+            for (int i = 3; i < 18; i += 3) {
+                if (result[i].length()) {
+                    modifier.emplace_back(result[i], result[i + 1]);
+                    // cerr << result[i] << endl;
+                    std::string key = result[i];
+                    key = " -" + key + "=\"";
+                    assert(input.find(key) == input.rfind(key));
+                    // cerr << result[i] << " " << result[i + 1] << endl;
                 }
             }
+            if (!cur_context->modify(modifier)) {
+                Invalid;
+            }
         } else if (std::regex_match(input, result, import_book)) {
-            assert(false);
             std::string _quantity = result[1], _total_cost = result[2];
             long long quantity;
             double total_cost;
@@ -217,6 +212,9 @@ int main() {
         } else if (std::regex_match(input, result, blank_cmd)) {
             continue;
         } else {
+            if ( input.contains("modify") ) {
+                assert(false);
+            }
             Invalid;
         }
         if (!eof_flag) {
