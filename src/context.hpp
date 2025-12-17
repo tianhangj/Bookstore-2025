@@ -77,6 +77,8 @@ class Context {
         delete this->bookname_db;
         delete this->author_db;
         delete this->keyword_db;
+
+        delete this->finance_db;
     }
     int get_privilege() { return cur_user.privilege; }
     Context* switch_user(String userid, String passwd) {
@@ -251,6 +253,7 @@ class Context {
         if (book.empty()) {
             return -1;
         }
+        assert(book.size()==1);
         if (book[0].quantity < quantity) {
             return -1;
         }
