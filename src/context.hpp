@@ -123,6 +123,7 @@ class Context {
         }
         assert(user.size() == 1);
         if (this->cur_user.privilege == 7 || user[0].passwd == cur_passwd) {
+            user_db->remove(userid, user[0]);
             user[0].passwd = new_passwd;
             user_db->insert(userid, user[0]);
             return true;
