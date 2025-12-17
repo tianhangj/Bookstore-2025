@@ -215,9 +215,9 @@ int main() {
             if ( input.find("show finance") != std::string::npos ) {
                 assert(false);
             }
-            if ( input.find("passwd") != std::string::npos ) {
-                assert(false);
-            }
+            // if ( input.find("passwd") != std::string::npos ) {
+            //     assert(false);
+            // }
             Invalid;
         }
         if (!eof_flag) {
