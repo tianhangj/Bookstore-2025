@@ -144,6 +144,7 @@ int main() {
                 }
             }
         } else if (std::regex_match(input, result, buy)) {
+            assert(false);
             std::string ISBN = result[1], _quantity = result[2];
             long long quantity;
             sscanf(_quantity.c_str(), "%lld", &quantity);
@@ -185,6 +186,7 @@ int main() {
                 }
             }
         } else if (std::regex_match(input, result, import_book)) {
+            assert(false);
             std::string _quantity = result[1], _total_cost = result[2];
             long long quantity;
             double total_cost;
@@ -200,6 +202,7 @@ int main() {
                 }
             }
         } else if (std::regex_match(input, result, show_finance)) {
+            assert(false);
             long long count = -1;
             std::string _count = result[2];
             sscanf(_count.c_str(), "%lld", &count);
