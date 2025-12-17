@@ -215,9 +215,6 @@ int main() {
         } else if (std::regex_match(input, result, blank_cmd)) {
             continue;
         } else {
-            if ( input.find("show finance") != std::string::npos ) {
-                assert(false);
-            }
             // if ( input.find("passwd") != std::string::npos ) {
             //     assert(false);
             // }
