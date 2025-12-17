@@ -195,6 +195,7 @@ class Context {
                 _keyword.s[j] = '\0';
                 keyword_db->insert(_keyword, book);
                 j = 0;
+                _keyword.s[j] = '\0';
             }
         }
         if (j) {
@@ -276,6 +277,9 @@ class Context {
         }
         std::vector<Book> book = ISBN_db->query(this->select_book);
         if (book.empty()) {
+            return false;
+        }
+        if ( modifier.size() == 0 ) {
             return false;
         }
         Book original_book = book[0], new_book = book[0];
