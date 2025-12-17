@@ -212,7 +212,7 @@ int main() {
         } else if (std::regex_match(input, result, blank_cmd)) {
             continue;
         } else {
-            if ( input.contains("modify") || input.contains("import") ) {
+            if ( input.find("modify") != std::string::npos || input.contains("import") != std::string::npos ) {
                 assert(false);
             }
             Invalid;
