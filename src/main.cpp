@@ -100,10 +100,8 @@ int main() {
                 Invalid;
             }
         } else if (std::regex_match(input, result, change_passwd)) {
-            assert(false);
-            std::string userid = result[1], cur_passwd, new_passwd;
-            cur_passwd = result[3];
-            new_passwd = result[4];
+            // assert(false);
+            std::string userid = result[1], cur_passwd = result[3], new_passwd = result[4];
             if (!cur_context->change_passwd(userid, cur_passwd, new_passwd)) {
                 Invalid;
             }
