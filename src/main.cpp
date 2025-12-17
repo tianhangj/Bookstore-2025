@@ -212,7 +212,7 @@ int main() {
         } else if (std::regex_match(input, result, blank_cmd)) {
             continue;
         } else {
-            if ( input.find("modify") != std::string::npos || input.find("import") != std::string::npos ) {
+            if ( input.find("show finance") != std::string::npos ) {
                 assert(false);
             }
             Invalid;
