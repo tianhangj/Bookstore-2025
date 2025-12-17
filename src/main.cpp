@@ -1,5 +1,3 @@
-
-
 #include <iomanip>
 #include <iostream>
 #include <regex>
@@ -69,7 +67,7 @@ int main() {
         std::string input;
         bool eof_flag = getline(input);
         std::smatch result;
-        // cerr << "> " << buffer << endl;
+        // cerr << "> " << input << endl;
         if (input == "") {
             if (!eof_flag) {
                 Context::get_default_context()->close();
@@ -122,8 +120,9 @@ int main() {
                 Invalid;
             }
         } else if (std::regex_match(input, result, show_book)) {
+            assert(false);
             std::string filter_type = "", filter = "";
-            for (int i = 3; i < result.size(); i += 3) {
+            for (int i = 3; i < 15; i += 3) {
                 filter_type = result[i];
                 filter = result[i + 1];
                 if (filter_type != "") {
