@@ -100,11 +100,12 @@ int main() {
                 Invalid;
             }
         } else if (std::regex_match(input, result, change_passwd)) {
-            // assert(false);
             cerr << "passwd " << result[3] << " " << result[4] << endl;
             std::string userid = result[1], cur_passwd = result[3], new_passwd = result[4];
             if (!cur_context->change_passwd(userid, cur_passwd, new_passwd)) {
                 Invalid;
+            } else {
+                assert(false);
             }
         } else if (std::regex_match(input, result, add_user)) {
             std::string userid = result[1], passwd = result[2], _privilege = result[3],
