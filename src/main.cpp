@@ -171,13 +171,18 @@ int main() {
                     // cerr << result[i] << endl;
                     std::string key = result[i];
                     key = " -" + key + "=";
-                    assert(input.find(key) == input.rfind(key));
+                    if ( input.find(key) != input.rfind(key) ) {
+                        Invalid;
+                        goto skip_rest;
+                    }
+                    // assert(input.find(key) == input.rfind(key));
                     // cerr << result[i] << " " << result[i + 1] << endl;
                 }
             }
             if (!cur_context->modify(modifier)) {
                 Invalid;
             }
+            skip_rest:
         } else if (std::regex_match(input, result, import_book)) {
             std::string _quantity = result[1], _total_cost = result[2];
             long long quantity;
