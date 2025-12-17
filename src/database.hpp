@@ -114,7 +114,6 @@ class Database {
                 return;
             }
         }
-        // cerr << "to_insert " << key.s << " " << value << endl;
         if (node.n == BLOCK_SIZE) {
             Node new_node;
             memset(&new_node, 0, sizeof(new_node));
@@ -153,7 +152,6 @@ class Database {
         this->_lower_bound(key, value, node, node_pos, value_index);
         if (value_index < node.n && value_index != -1 &&
             node.key_values[value_index] == std::make_pair(key, value)) {
-            // cerr << "removed " << node.key_values[value_index].first.s << " " << value << endl;
             node.n--;
             for (int i = value_index; i < node.n; ++i) {
                 node.key_values[i] = node.key_values[i + 1];
@@ -178,11 +176,6 @@ class Database {
         int node_pos, value_index;
         this->_lower_bound(key, node, node_pos, value_index);
         std::vector<T> ret;
-        // cerr << node_pos << " " << value_index << " " << node.n << endl;
-        // cerr << node.key_values[value_index-1].first.s << " " <<
-        // node.key_values[value_index-1].second << endl; cerr <<
-        // node.key_values[value_index].first.s << " " << node.key_values[value_index].second <<
-        // endl;
         while (node_pos != -1 && value_index < node.n && value_index != -1 &&
                node.key_values[value_index].first == key) {
             ret.push_back(node.key_values[value_index].second);

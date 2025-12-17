@@ -19,13 +19,7 @@ struct User {
         static User _user("defaultuser0", "defaultuser0", "", 0);
         return _user;
     }
-    const bool operator==(const User rhs) const {
-        return this->userid == rhs.userid;
-    }
-    const bool operator<(const User rhs) const {
-        return this->userid < rhs.userid;
-    }
-    const bool operator>=(const User rhs) const {
-        return this->userid >= rhs.userid;
-    }
+    const bool operator==(const User rhs) const { return this->userid == rhs.userid; }
+    const bool operator<(const User rhs) const { return this->userid < rhs.userid; }
+    const bool operator>=(const User rhs) const { return this->userid >= rhs.userid; }
 };

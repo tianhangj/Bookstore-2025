@@ -11,12 +11,6 @@ Context* cur_context;
 // patterns
 const std::regex quit("^ *(exit|quit) *$");
 
-// [UserID]: ([0-9a-zA-Z_]+)
-// [Password]: ([0-9a-zA-Z_]+)
-// [CurrentPassword]: ([0-9a-zA-Z_]+)
-// [NewPassword]: ([0-9a-zA-Z_]+)
-// [Username]: (.+)
-// [Privilege]: ([0137])
 const std::regex switch_user("^ *su +([0-9a-zA-Z_]{1,30})( +([0-9a-zA-Z_]{1,30}))? *$");
 const std::regex logout("^ *logout *$");
 const std::regex register_user(
@@ -27,9 +21,6 @@ const std::regex add_user(
     "^ *useradd +([0-9a-zA-Z_]{1,30}) +([0-9a-zA-Z_]{1,30}) +([0137]) +([\\x21-\\x7e]{1,30}) *$");
 const std::regex delete_user("^ *delete +([0-9a-zA-Z_]{1,30}) *$");
 
-// [ISBN]: ([^\\s]+:ISBN)
-// [BookName]: ([^\"]+:bookname)
-// [Quantity]: ([0-9]+:quantity)
 const std::regex show_book(
     "^ *show(( +-(ISBN)=([\\x21-\\x7e]{1,20}))|( +-(name)=\"([\\x21\\x23-\\x7e]{1,60})\")|( +-(author)=\"([\\x21\\x23-\\x7e]{1,60})\")|( +-(keyword)=\"([\\x21\\x23-\\x7e]{1,60})\"))? *$");
 const std::regex buy("^ *buy +([\\x21-\\x7e]{1,20}) +([1-9][0-9]{0,9}) *$");
@@ -45,7 +36,6 @@ const std::regex show_finance("^ *show +finance( +(([1-9][0-9]{0,9})|0))? *$");
 
 const std::regex blank_cmd("^ *$");
 
-// #define Invalid cout << "Invalid" << "--------------" << __LINE__ << "\n"
 #define Invalid cout << "Invalid\n"
 using std::cout, std::cerr, std::endl;
 
@@ -126,7 +116,6 @@ int main() {
                     break;
                 }
             }
-            // cerr << filter_type << " " << filter << endl;
             std::vector<Book> output;
             if (cur_context->find_book(filter_type, filter, output)) {
                 if (output.size() == 0) {
@@ -161,22 +150,16 @@ int main() {
                 Invalid;
             }
         } else if (std::regex_match(input, result, modify_book)) {
-            // for ( auto p: result ) {
-            //     cerr << p << endl;
-            // }
             std::vector<std::pair<String, String>> modifier;
             for (int i = 3; i < 18; i += 3) {
                 if (result[i].length()) {
                     modifier.emplace_back(result[i], result[i + 1]);
-                    // cerr << result[i] << endl;
                     std::string key = result[i];
                     key = " -" + key + "=";
                     if ( input.find(key) != input.rfind(key) ) {
                         Invalid;
                         goto skip_rest;
                     }
-                    // assert(input.find(key) == input.rfind(key));
-                    // cerr << result[i] << " " << result[i + 1] << endl;
                 }
             }
             if (!cur_context->modify(modifier)) {
@@ -215,9 +198,6 @@ int main() {
         } else if (std::regex_match(input, result, blank_cmd)) {
             continue;
         } else {
-            // if ( input.find("passwd") != std::string::npos ) {
-            //     assert(false);
-            // }
             Invalid;
         }
         if (!eof_flag) {
