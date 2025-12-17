@@ -86,6 +86,7 @@ class Context {
     Context* switch_user(String userid, String passwd) {
         std::vector<User> user = user_db->query(userid);
         if (user.empty()) {
+            assert(false);
             return nullptr;
         }
         assert(user.size() == 1);
@@ -93,6 +94,7 @@ class Context {
             login_users->insert(user[0].userid);
             return new Context(this, user[0]);
         } else {
+            assert(false);
             return nullptr;
         }
     }
