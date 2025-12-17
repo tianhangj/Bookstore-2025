@@ -120,7 +120,6 @@ int main() {
                 Invalid;
             }
         } else if (std::regex_match(input, result, show_book)) {
-            assert(false);
             std::string filter_type = "", filter = "";
             for (int i = 3; i < 15; i += 3) {
                 filter_type = result[i];
@@ -164,6 +163,7 @@ int main() {
                 Invalid;
             }
         } else if (std::regex_match(input, result, modify_book)) {
+            assert(false);
             if (result.size() == 1) {
                 Invalid;
             } else {
