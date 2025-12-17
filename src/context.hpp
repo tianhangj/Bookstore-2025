@@ -330,6 +330,8 @@ class Context {
                 double _price;
                 sscanf(value.s, "%lf", &(_price));
                 new_book.price = _price;
+            } else {
+                assert(false);
             }
         }
         this->remove_book(original_book);

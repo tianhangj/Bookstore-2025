@@ -37,9 +37,9 @@ const std::regex select_book("^ *select +([\\x21-\\x7e]{1,20}) *$");
 const std::regex modify_book(
     "^ *modify(( +-(ISBN)=([\\x21-\\x7e]{1,20}))|( +-(name)=\"([\\x21\\x23-\\x7e]{1,60})\")|( "
     "+-(author)=\"([\\x21\\x23-\\x7e]{1,60})\")|( +"
-    "-(keyword)=\"([\\x21\\x23-\\x7e]{1,60})\")|( +-(price)=((([1-9][0-9]*)|0)(\\.[0-9]{1,2})?)))+ *$");
+    "-(keyword)=\"([\\x21\\x23-\\x7e]{1,60})\")|( +-(price)=((([1-9][0-9]{0,12})|0)(\\.[0-9]{1,2})?)))+ *$");
 const std::regex import_book(
-    "^ *import +([1-9][0-9]{0,9}) +((([1-9][0-9]*)|0)(\\.[0-9]{1,2})?) *$");
+    "^ *import +([1-9][0-9]{0,9}) +((([1-9][0-9]{0,12})|0)(\\.[0-9]{1,2})?) *$");
 
 const std::regex show_finance("^ *show +finance( +(([1-9][0-9]{0,9})|0))? *$");
 
@@ -163,7 +163,6 @@ int main() {
                 Invalid;
             }
         } else if (std::regex_match(input, result, modify_book)) {
-            assert(false);
             if (result.size() == 1) {
                 Invalid;
             } else {
