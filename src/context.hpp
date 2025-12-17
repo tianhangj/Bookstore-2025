@@ -174,6 +174,7 @@ class Context {
                 _keyword.s[j] = '\0';
                 keyword_db->remove(_keyword, book);
                 j = 0;
+                _keyword.s[j] = '\0';
             }
         }
         if (j) {
