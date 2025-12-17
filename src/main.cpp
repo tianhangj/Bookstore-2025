@@ -11,6 +11,8 @@ char buffer[1024];
 Context* cur_context;
 
 // patterns
+const std::regex quit("^ *(exit|quit) *$");
+
 // [UserID]: ([0-9a-zA-Z_]+)
 // [Password]: ([0-9a-zA-Z_]+)
 // [CurrentPassword]: ([0-9a-zA-Z_]+)
@@ -68,10 +70,6 @@ int main() {
         bool eof_flag = getline(input);
         std::smatch result;
         // cerr << "> " << buffer << endl;
-        if (input == "exit" || input == "quit") {
-            Context::get_default_context()->close();
-            return 0;
-        }
         if (input == "") {
             if (!eof_flag) {
                 Context::get_default_context()->close();
@@ -79,7 +77,10 @@ int main() {
             }
             continue;
         }
-        if (std::regex_match(input, result, switch_user)) {
+        if (std::regex_match(input, result, quit)) {
+            Context::get_default_context()->close();
+            return 0;
+        } else if (std::regex_match(input, result, switch_user)) {
             std::string userid = result[1], passwd = result[3];
             Context* ret = cur_context->switch_user(userid, passwd);
             if (ret != nullptr) {
@@ -89,7 +90,9 @@ int main() {
             }
         } else if (std::regex_match(input, result, logout)) {
             if (cur_context->logout()) {
+                Context* _context = cur_context;
                 cur_context = cur_context->father_context;
+                delete _context;
             } else {
                 Invalid;
             }

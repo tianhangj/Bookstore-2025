@@ -71,6 +71,8 @@ class Context {
         return &context;
     }
     void close() {
+        delete login_users;
+
         delete this->user_db;
 
         delete this->ISBN_db;
