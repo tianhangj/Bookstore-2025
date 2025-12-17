@@ -256,7 +256,7 @@ class Context {
         if (book.empty()) {
             return -1;
         }
-        assert(book.size()==1);
+        assert(book.size() == 1);
         if (book[0].quantity < quantity) {
             return -1;
         }
@@ -279,7 +279,7 @@ class Context {
         if (book.empty()) {
             return false;
         }
-        if ( modifier.size() == 0 ) {
+        if (modifier.size() == 0) {
             return false;
         }
         Book original_book = book[0], new_book = book[0];
@@ -326,12 +326,16 @@ class Context {
                 if (strlen(value.s) > 13) {
                     return false;
                 }
-                sscanf(value.s, "%lf", &(new_book.price));
+                double _price;
+                sscanf(value.s, "%lf", &(_price));
+                if (_price == 0) {
+                    return false;
+                }
+                new_book.price = _price;
             }
         }
         this->remove_book(original_book);
         this->update_book(new_book);
-        this->select_book = new_book.ISBN;
         for (struct Context* i = this; i != nullptr; i = i->father_context) {
             if (i->select_book == original_book.ISBN) {
                 i->select_book = new_book.ISBN;
