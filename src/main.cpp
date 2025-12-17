@@ -20,24 +20,24 @@ Context* cur_context;
 const std::regex switch_user("^ *su +([0-9a-zA-Z_]{1,30})( +([0-9a-zA-Z_]{1,30}))? *$");
 const std::regex logout("^ *logout *$");
 const std::regex register_user(
-    "^ *register +([0-9a-zA-Z_]{1,30}) +([0-9a-zA-Z_]{1,30}) +([\u0021-\u00ff]{1,30}) *$");
+    "^ *register +([0-9a-zA-Z_]{1,30}) +([0-9a-zA-Z_]{1,30}) +([\\x21-\\u007e]{1,30}) *$");
 const std::regex change_passwd(
     "^ *passwd +([0-9a-zA-Z_]{1,30})( +([0-9a-zA-Z_]{1,30}))? +([0-9a-zA-Z_]{1,30}) *$");
 const std::regex add_user(
-    "^ *useradd +([0-9a-zA-Z_]{1,30}) +([0-9a-zA-Z_]{1,30}) +([0137]) +([\u0021-\u00ff]{1,30}) *$");
+    "^ *useradd +([0-9a-zA-Z_]{1,30}) +([0-9a-zA-Z_]{1,30}) +([0137]) +([\\x21-\\u007e]{1,30}) *$");
 const std::regex delete_user("^ *delete +([0-9a-zA-Z_]{1,30}) *$");
 
 // [ISBN]: ([^\\s]+:ISBN)
 // [BookName]: ([^\"]+:bookname)
 // [Quantity]: ([0-9]+:quantity)
 const std::regex show_book(
-    "^ *show(( +-(ISBN)=([\u0021-\u00ff]{1,20}))|( +-(name)=\"([\u0021\u0023-\u00ff]{1,60})\")|( +-(author)=\"([\u0021\u0023-\u00ff]{1,60})\")|( +-(keyword)=\"([\u0021\u0023-\u00ff]{1,60})\"))? *$");
-const std::regex buy("^ *buy +([\u0021-\u00ff]{1,20}) +([1-9][0-9]{0,9}) *$");
-const std::regex select_book("^ *select +([\u0021-\u00ff]{1,20}) *$");
+    "^ *show(( +-(ISBN)=([\\x21-\\u007e]{1,20}))|( +-(name)=\"([\\x21\\x23-\\u007e]{1,60})\")|( +-(author)=\"([\\x21\\x23-\\x7e]{1,60})\")|( +-(keyword)=\"([\\x21\\x23-\\x7e]{1,60})\"))? *$");
+const std::regex buy("^ *buy +([\\x21-\\u007e]{1,20}) +([1-9][0-9]{0,9}) *$");
+const std::regex select_book("^ *select +([\\x21-\\u007e]{1,20}) *$");
 const std::regex modify_book(
-    "^ *modify(( +-(ISBN)=([\u0021-\u00ff]{1,20}))|( +-(name)=\"([\u0021\u0023-\u00ff]{1,60})\")|( "
-    "+-(author)=\"([\u0021\u0023-\u00ff]{1,60})\")|( +"
-    "-(keyword)=\"([\u0021\u0023-\u00ff]{1,60})\")|( +-(price)=((([1-9][0-9]*)|0)(\\.[0-9]{1,2})?)))+ *$");
+    "^ *modify(( +-(ISBN)=([\\x21-\\u007e]{1,20}))|( +-(name)=\"([\\u0021\\x23-\\u007e]{1,60})\")|( "
+    "+-(author)=\"([\\x21\\x23-\\u007e]{1,60})\")|( +"
+    "-(keyword)=\"([\\x21\\x23-\\u007e]{1,60})\")|( +-(price)=((([1-9][0-9]*)|0)(\\.[0-9]{1,2})?)))+ *$");
 const std::regex import_book(
     "^ *import +([1-9][0-9]{0,9}) +((([1-9][0-9]*)|0)(\\.[0-9]{1,2})?) *$");
 
