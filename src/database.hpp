@@ -169,6 +169,8 @@ class Database {
                 }
             }
             this->write(node, node_pos);
+        } else {
+            assert(false);
         }
     }
     std::vector<T> query(Key key) {
