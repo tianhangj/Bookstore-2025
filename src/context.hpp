@@ -328,9 +328,6 @@ class Context {
                 }
                 double _price;
                 sscanf(value.s, "%lf", &(_price));
-                if (_price == 0) {
-                    return false;
-                }
                 new_book.price = _price;
             }
         }
