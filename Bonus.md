@@ -88,7 +88,7 @@ std::basic_string<CharT> str1, str2;
 // 验证 str1 中的所有字符都包含于 str2 中
 // 例如 expect(std::string("1024.00")).toBeConsistedOf("42.01")
 // 提示：std::basic_string<CharT>::find()
-expect(str1).consistedOf(str2);
+expect(str1).toBeConsistedOf(str2);
 
 // 验证 str1 符合 str2 这个正则表达式
 // 提示：可以使用 std::basic_regex<CharT> 实现
