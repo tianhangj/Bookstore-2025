@@ -33,6 +33,9 @@ const std::regex import_book(
     "^ *import +([1-9][0-9]{0,9}) +((([1-9][0-9]{0,12})|0)(\\.[0-9]{1,2})?) *$");
 
 const std::regex show_finance("^ *show +finance( +(([1-9][0-9]{0,9})|0))? *$");
+const std::regex report_employee("^ *report +employee *$");
+const std::regex report_finance("^ *report +finance *$");
+const std::regex log("^ *log *$");
 
 const std::regex blank_cmd("^ *$");
 
@@ -194,6 +197,39 @@ int main() {
                 } else {
                     Invalid;
                 }
+            }
+        } else if (std::regex_match(input, result, log)) {
+            std::vector<String> logs;
+            if (cur_context->log_all(logs)) {
+                for (auto v: logs) {
+                    cout << v << "\n";
+                }
+            } else {
+                Invalid;
+            }
+        } else if (std::regex_match(input, result, report_employee)) {
+            std::map<String,std::vector<String>> logs;
+            if (cur_context->report_employee(logs)) {
+                for (auto [id, _logs]: logs) {
+                    cout << "--------------------------------\n";
+                    cout << "Employee id=" << id << "\n";
+                    for (auto log: _logs) {
+                        cout << log << "\n";
+                    }
+                }
+            } else {
+                Invalid;
+            }
+        } else if (std::regex_match(input, result, report_finance)) {
+            std::map<String, std::pair<double, double>> finances;
+            if (cur_context->report_finance(finances)) {
+                cout << "ISBN" << "|" << "\t-" << "cost" << "\t|+" << "earn" << "\n";
+                for (auto [book, f]: finances) {
+                    auto [i,o] = f;
+                    cout << book << ": " << "\t-" << i << "\t+" << o << "\n";
+                }
+            } else {
+                Invalid;
             }
         } else if (std::regex_match(input, result, blank_cmd)) {
             continue;

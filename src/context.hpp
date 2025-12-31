@@ -1,16 +1,24 @@
 #pragma once
 
 #include <filesystem>
+#include <format>
+#include <map>
 #include <set>
 #include <utility>
 #include <vector>
 
 #include "book.hpp"
 #include "database.hpp"
+#include "string.hpp"
 #include "user.hpp"
 
 class Context {
    private:
+    template <class... Arg>
+    void log(std::string str) {
+        auto [timestamp, _str] = log_db->begin();
+        log_db->insert(timestamp - 1, str);
+    }
     Context() {
         if (!std::filesystem::exists("./data")) {
             std::filesystem::create_directory("./data");
@@ -35,6 +43,13 @@ class Context {
         if (finance_root.empty()) {
             finance_db->insert(0, std::make_pair(0.0, 0.0));
         }
+        log_db = new Database<int, String>("./data/log.db");
+        auto log_first = log_db->query(0);
+        if (log_first.empty()) {
+            log_db->insert(0, "Bookstore initialized.");
+        }
+        employee_log_db = new Database<String, String>("./data/emply.db");
+        book_finance_db = new Database<String, std::pair<double, double>>("./data/book_finance.db");
         this->father_context = nullptr;
     }
     Context(Context* context, User user) {
@@ -46,6 +61,9 @@ class Context {
         author_db = context->author_db;
         keyword_db = context->keyword_db;
         finance_db = context->finance_db;
+        log_db = context->log_db;
+        employee_log_db = context->employee_log_db;
+        book_finance_db = context->book_finance_db;
 
         cur_user = user;
         select_book = "";
@@ -62,6 +80,9 @@ class Context {
     Database<String, Book>* author_db;
     Database<String, Book>* keyword_db;
     Database<int, std::pair<double, double>>* finance_db;
+    Database<int, String>* log_db;
+    Database<String, String>* employee_log_db;
+    Database<String, std::pair<double, double>>* book_finance_db;
     struct Context* father_context;
 
    public:
@@ -91,6 +112,8 @@ class Context {
         assert(user.size() == 1);
         if (this->cur_user.privilege > user[0].privilege || user[0].passwd == passwd) {
             login_users->insert(user[0].userid);
+            log(std::format("[INFO]user[id={}]: Switched to user[id={}]", cur_user.userid.s,
+                            userid.s));
             return new Context(this, user[0]);
         } else {
             return nullptr;
@@ -110,6 +133,8 @@ class Context {
             return false;
         }
         user_db->insert(userid, User(userid, username, passwd, 1));
+        employee_log_db->insert(cur_user.userid.s, std::format("Register user[id={}]", userid.s));
+        log(std::format("[INFO]user[id={}]: Register user[id={}]", cur_user.userid.s, userid.s));
         return true;
     }
 
@@ -126,6 +151,9 @@ class Context {
             user_db->remove(userid, user[0]);
             user[0].passwd = new_passwd;
             user_db->insert(userid, user[0]);
+            employee_log_db->insert(cur_user.userid.s,
+                                    std::format("Changed passwd user[id={}]", userid.s));
+            log(std::format("[INFO]Changed passwd user[id={}]", cur_user.userid.s, userid.s));
             return true;
         } else {
             return false;
@@ -144,6 +172,8 @@ class Context {
             return false;
         }
         user_db->insert(userid, User(userid, username, passwd, privilege));
+        employee_log_db->insert(cur_user.userid.s, std::format("Add user[id={}]", userid.s));
+        log(std::format("[INFO]user[id={}]: Add user[id={}]", cur_user.userid.s, userid.s));
         return true;
     }
 
@@ -159,6 +189,8 @@ class Context {
             return false;
         }
         user_db->remove(userid, user[0]);
+        employee_log_db->insert(cur_user.userid.s, std::format("Delete user[id={}]", userid.s));
+        log(std::format("[INFO]user[id={}]: Delete user[id={}]", cur_user.userid.s, userid.s));
         return true;
     }
 
@@ -210,6 +242,10 @@ class Context {
         if (this->cur_user.privilege < 1) {
             return false;
         }
+        employee_log_db->insert(cur_user.userid.s,
+                                std::format("Find book: -{}={}", filter_type.s, filter.s));
+        log(std::format("[INFO]user[id={}]: Find book: -{}={}", cur_user.userid.s, filter_type.s,
+                        filter.s));
         if (filter_type == "ISBN") {
             output = ISBN_db->query(filter);
             return true;
@@ -244,6 +280,7 @@ class Context {
             update_book(b);
         }
         this->select_book = ISBN;
+        log(std::format("[INFO]user[id={}]: Select book: {}", cur_user.userid.s, ISBN.s));
         return true;
     }
 
@@ -267,6 +304,17 @@ class Context {
         double cost = book[0].price * quantity;
         auto [timestamp, p] = finance_db->begin();
         finance_db->insert(timestamp - 1, std::make_pair(p.first + cost, p.second));
+        auto book_finance = book_finance_db->query(ISBN);
+        if (book_finance.empty()) {
+            assert(false);
+        } else {
+            book_finance_db->remove(ISBN, book_finance[0]);
+            book_finance[0].second += cost;
+            book_finance_db->insert(ISBN, book_finance[0]);
+        }
+        employee_log_db->insert(
+            cur_user.userid.s, std::format("Buy book: {} {}", cur_user.userid.s, ISBN.s, quantity));
+        log(std::format("[INFO]user[id={}]: Buy book: {} {}", cur_user.userid.s, ISBN.s, quantity));
         return cost;
     }
 
@@ -342,6 +390,9 @@ class Context {
                 i->select_book = new_book.ISBN;
             }
         }
+        employee_log_db->insert(cur_user.userid.s,
+                                std::format("Modify book[{}]", cur_user.userid.s, select_book.s));
+        log(std::format("[INFO]user[id={}]: Modify book[{}]", cur_user.userid.s, select_book.s));
         return true;
     }
 
@@ -363,6 +414,19 @@ class Context {
         finance_db->insert(timestamp - 1, std::make_pair(p.first, p.second + total_cost));
         book[0].quantity += quantity;
         this->update_book(book[0]);
+        auto book_finance = book_finance_db->query(select_book);
+        if (book_finance.empty()) {
+            book_finance_db->insert(select_book, std::make_pair(total_cost, 0));
+        } else {
+            book_finance_db->remove(select_book, book_finance[0]);
+            book_finance[0].first += total_cost;
+            book_finance_db->insert(select_book, book_finance[0]);
+        }
+        employee_log_db->insert(cur_user.userid.s,
+                                std::format("Import book[{}] {}/{}", cur_user.userid.s,
+                                            select_book.s, total_cost, quantity));
+        log(std::format("[INFO]user[id={}]: Import book[{}] {}/{}", cur_user.userid.s,
+                        select_book.s, total_cost, quantity));
         return true;
     }
 
@@ -386,6 +450,38 @@ class Context {
             b -= ret[0].second;
         }
         sprintf(out.s, "+ %.2lf - %.2lf", a, b);
+        return true;
+    }
+    bool log_all(std::vector<String>& out) {
+        if (this->cur_user.privilege < 7) {
+            return false;
+        }
+        out = log_db->getall();
+        return true;
+    }
+    bool report_employee(std::map<String, std::vector<String>>& out) {
+        if (this->cur_user.privilege < 7) {
+            return false;
+        }
+        auto users = user_db->getall();
+        for (auto user : users) {
+            if (user.privilege >= 3) {
+                out[user.userid] = employee_log_db->query(user.userid);
+            }
+        }
+        return true;
+    }
+    bool report_finance(std::map<String, std::pair<double, double>>& out) {
+        if (this->cur_user.privilege < 7) {
+            return false;
+        }
+        auto books = ISBN_db->getall();
+        for (auto book : books) {
+            auto finance = book_finance_db->query(book.ISBN);
+            if (!finance.empty()) {
+                out[book.ISBN] = finance[0];
+            }
+        }
         return true;
     }
 };
